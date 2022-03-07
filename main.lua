@@ -50,10 +50,6 @@ VIRTUAL_HEIGHT = 243
 -- paddle movement speed
 PADDLE_SPEED = 200
 
-
---GAME MODE
-GAME_MODE = 1;
-
 --[[
     Called just once at the beginning of the game; used to set up
     game objects, variables, etc. and prepare the game world.
@@ -246,9 +242,6 @@ function love.update(dt)
     end
 
     -- player 2
-if GAME_MODE == 1 then
-        player2.dy = ball.dy
-elseif GAME_MODE == 2 then
     if love.keyboard.isDown('up') then
         player2.dy = -PADDLE_SPEED
     elseif love.keyboard.isDown('down') then
@@ -256,7 +249,6 @@ elseif GAME_MODE == 2 then
     else
         player2.dy = 0
     end
-end
 
     -- update our ball based on its DX and DY only if we're in play state;
     -- scale the velocity by dt so movement is framerate-independent
@@ -283,14 +275,15 @@ function love.keypressed(key)
     -- transition to the next appropriate state
     elseif key == 'enter' or key == 'return' then
         if gameState == 'start' then
-            gameState = 'serve'
+            gameState = 'mode'
+        elseif gameState == 'mode' then
+
         elseif gameState == 'serve' then
             gameState = 'play'
         elseif gameState == 'done' then
             -- game is simply in a restart phase here, but will set the serving
             -- player to the opponent of whomever won for fairness!
             gameState = 'serve'
-
 
             ball:reset()
 
@@ -302,16 +295,25 @@ function love.keypressed(key)
             if winningPlayer == 1 then
                 servingPlayer = 2
             else
-                servingPlayer = 1      
+                servingPlayer = 1
             end
         end
+    -- Tells the mode of the game
     elseif key == '1' then
-        GAME_MODE = 1
-        gameState = 'start'
+        if gameState == 'mode' then
+        gameMode = 'pvp'
+        gameState = 'serve'
+        end
     elseif key == '2' then
-        GAME_MODE = 2
-        gameState = 'start'
-          
+        if gameState == 'mode' then
+        gameMode = 'pva'
+        gameState = 'serve'
+        end
+    elseif key == '3' then
+        if gameState == 'mode' then
+        gameMode = 'ava'
+        gameState = 'serve'
+        end
     end
 end
 
@@ -330,8 +332,22 @@ function love.draw()
         -- UI messages
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Select a Mode', 0, 20, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press 1 For 1 Player Mode 2 For 2 Player Mode', 0, 30, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+    elseif gameState == 'mode' then
+        love.graphics.setFont(largeFont)
+        love.graphics.printf('This is the mode!', 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Press 1 for Player vs Player.', 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press 2 for Player vs AI', 0, 60, VIRTUAL_WIDTH, 'center')   
+        love.graphics.printf('Press 3 for AI vs AI', 0, 70, VIRTUAL_WIDTH, 'center')
+    -- AI difficulty mode   
+    elseif gameState == 'difficulty' then
+        love.graphics.setFont(largeFont)
+        love.graphics.printf('This is the difficulty', 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Press 1 for Player vs Player.', 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press 2 for Player vs AI', 0, 60, VIRTUAL_WIDTH, 'center')   
+        love.graphics.printf('Press 3 for AI vs AI', 0, 70, VIRTUAL_WIDTH, 'center')   
     elseif gameState == 'serve' then
         -- UI messages
         love.graphics.setFont(smallFont)
@@ -350,11 +366,12 @@ function love.draw()
     end
 
     -- show the score before ball is rendered so it can move over the text
+    if not(gameState == 'start' or gameState == 'mode') then
     displayScore()
-    
     player1:render()
     player2:render()
     ball:render()
+    end
 
     -- display FPS for debugging; simply comment out to remove
     displayFPS()
