@@ -242,14 +242,39 @@ function love.update(dt)
     end
 
     -- player 2
-    if love.keyboard.isDown('up') then
-        player2.dy = -PADDLE_SPEED
-    elseif love.keyboard.isDown('down') then
-        player2.dy = PADDLE_SPEED
-    else
-        player2.dy = 0
+    --Player vs Player
+    if gameMode == 'pvp' then
+        if love.keyboard.isDown('up') then
+            player2.dy = -PADDLE_SPEED
+        elseif love.keyboard.isDown('down') then
+            player2.dy = PADDLE_SPEED
+        else
+            player2.dy = 0
+        end
+    elseif gameMode == 'pva' then
+        -- checks if the ball is near the player2 paddle
+        if ball.x > (player2.x-100) then
+            -- Player vs AI's AI
+            if ball.y > player2.y then
+                --check if in y axis the ball and paddle is near each other
+                                        --check distance
+                if (player2.y-ball.y)*(player2.y-ball.y) > 30 then
+                    player2.dy = 300
+                elseif (player2.y-ball.y)*(player2.y-ball.y) < 30 then
+                    player2.dy = 100
+                end
+            elseif ball.y < player2.y then
+                                        --check distance
+                if (player2.y-ball.y)*(player2.y-ball.y) > 30 then
+                    player2.dy = -300
+                elseif (player2.y-ball.y)*(player2.y-ball.y) < 30 then
+                    player2.dy = -100
+                end
+            end
+        else
+            player2.dy = 0
+        end
     end
-
     -- update our ball based on its DX and DY only if we're in play state;
     -- scale the velocity by dt so movement is framerate-independent
     if gameState == 'play' then
@@ -277,7 +302,6 @@ function love.keypressed(key)
         if gameState == 'start' then
             gameState = 'mode'
         elseif gameState == 'mode' then
-
         elseif gameState == 'serve' then
             gameState = 'play'
         elseif gameState == 'done' then
@@ -301,18 +325,28 @@ function love.keypressed(key)
     -- Tells the mode of the game
     elseif key == '1' then
         if gameState == 'mode' then
-        gameMode = 'pvp'
-        gameState = 'serve'
+            gameMode = 'pvp'
+            -- straight to serve because player vs player
+            gameState = 'serve'
+        elseif gameState == 'difficulty' then
+            gameDiff = 'easy'
+            gameState = 'serve'
         end
     elseif key == '2' then
         if gameState == 'mode' then
-        gameMode = 'pva'
-        gameState = 'serve'
+            gameMode = 'pva'
+            gameState = 'difficulty'
+        elseif gameState == 'difficulty' then
+            gameDiff = 'medium'
+            gameState= 'serve'
         end
     elseif key == '3' then
         if gameState == 'mode' then
-        gameMode = 'ava'
-        gameState = 'serve'
+            gameMode = 'ava'
+            gameState = 'difficulty'
+        elseif gameState == 'difficulty' then
+            gameDiff = 'hard'
+            gameState = 'serve'
         end
     end
 end
@@ -333,6 +367,7 @@ function love.draw()
         love.graphics.setFont(smallFont)
         love.graphics.printf('Welcome to Pong!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.printf('Press Enter to begin!', 0, 20, VIRTUAL_WIDTH, 'center')
+        -- game mode
     elseif gameState == 'mode' then
         love.graphics.setFont(largeFont)
         love.graphics.printf('This is the mode!', 0, 10, VIRTUAL_WIDTH, 'center')
@@ -343,18 +378,21 @@ function love.draw()
     -- AI difficulty mode   
     elseif gameState == 'difficulty' then
         love.graphics.setFont(largeFont)
-        love.graphics.printf('This is the difficulty', 0, 10, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('This is the difficulty!', 0, 10, VIRTUAL_WIDTH, 'center')
         love.graphics.setFont(smallFont)
-        love.graphics.printf('Press 1 for Player vs Player.', 0, 50, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press 2 for Player vs AI', 0, 60, VIRTUAL_WIDTH, 'center')   
-        love.graphics.printf('Press 3 for AI vs AI', 0, 70, VIRTUAL_WIDTH, 'center')   
+        love.graphics.printf('Press 1 for Easy', 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Press 2 for Medium', 0, 60, VIRTUAL_WIDTH, 'center')   
+        love.graphics.printf('Press 3 for Hard', 0, 70, VIRTUAL_WIDTH, 'center')   
     elseif gameState == 'serve' then
         -- UI messages
         love.graphics.setFont(smallFont)
         love.graphics.printf('Player ' .. tostring(servingPlayer) .. "'s serve!", 
             0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Press Enter to serve!', 0, 20, VIRTUAL_WIDTH, 'center')
     elseif gameState == 'play' then
+        --for debugging
+        love.graphics.setFont(smallFont)
+        love.graphics.printf('Ball x: ' .. tostring(ball.x) .. 'Ball y: ' .. tostring(ball.y), 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Ball and paddle distance to each other: ' .. tostring((player2.y-ball.y)*(player2.y-ball.y)), 0, 70, VIRTUAL_WIDTH, 'center')
         -- no UI messages to display in play
     elseif gameState == 'done' then
         -- UI messages
@@ -366,7 +404,7 @@ function love.draw()
     end
 
     -- show the score before ball is rendered so it can move over the text
-    if not(gameState == 'start' or gameState == 'mode') then
+    if not(gameState == 'start' or gameState == 'mode' or gameState == 'difficulty') then
     displayScore()
     player1:render()
     player2:render()
