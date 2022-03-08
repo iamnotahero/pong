@@ -258,17 +258,27 @@ function love.update(dt)
             if ball.y > player2.y then
                 --check if in y axis the ball and paddle is near each other
                                         --check distance
-                if (player2.y-ball.y)*(player2.y-ball.y) > 30 then
-                    player2.dy = 300
-                elseif (player2.y-ball.y)*(player2.y-ball.y) < 30 then
-                    player2.dy = 100
+                                        -- the distance formula y1 - y2 * y1 - y2
+                if math.abs(player2.y-ball.y) > 100 then
+                    player2.dy = 500+math.abs(ball.y)
+                elseif math.abs(player2.y-ball.y) < 100 and math.abs(player2.y-ball.y) > 30 then
+                    player2.dy = 300+math.abs(ball.y)
+                elseif math.abs(player2.y-ball.y) < 30  and math.abs(player2.y-ball.y) > 3 then
+                    player2.dy = 150+math.abs(ball.y)
+                elseif math.abs(player2.y-ball.y) < 3 then
+                    player2.dy = 0
                 end
             elseif ball.y < player2.y then
                                         --check distance
-                if (player2.y-ball.y)*(player2.y-ball.y) > 30 then
-                    player2.dy = -300
-                elseif (player2.y-ball.y)*(player2.y-ball.y) < 30 then
-                    player2.dy = -100
+                                        -- the distance formula y1 - y2 * y1 - y2
+                if math.abs(player2.y-ball.y) > 100 then
+                    player2.dy = -500-math.abs(ball.y)
+                elseif math.abs(player2.y-ball.y) < 100 and math.abs(player2.y-ball.y) > 30 then
+                    player2.dy = -300-math.abs(ball.y)
+                elseif math.abs(player2.y-ball.y) < 30 and math.abs(player2.y-ball.y) > 3 then
+                    player2.dy = -150-math.abs(ball.y)
+                elseif math.abs(player2.y-ball.y) < 3 then
+                    player2.dy = 0
                 end
             end
         else
@@ -392,7 +402,9 @@ function love.draw()
         --for debugging
         love.graphics.setFont(smallFont)
         love.graphics.printf('Ball x: ' .. tostring(ball.x) .. 'Ball y: ' .. tostring(ball.y), 0, 50, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Ball and paddle distance to each other: ' .. tostring((player2.y-ball.y)*(player2.y-ball.y)), 0, 70, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Ball and paddle distance to each other: ' .. tostring(math.abs(player2.y-ball.y)), 0, 70, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Paddle Speed Direction: ' .. tostring(math.abs(player2.dy)), 0, 30, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Ball Speed Direction: ' .. tostring(math.abs(ball.dy)), 0, 10, VIRTUAL_WIDTH, 'center')
         -- no UI messages to display in play
     elseif gameState == 'done' then
         -- UI messages
