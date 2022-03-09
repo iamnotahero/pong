@@ -89,7 +89,7 @@ function love.load()
 
     -- initialize our player paddles; make them global so that they can be
     -- detected by other functions and modules
-    player1 = Paddle(10, 30, 5, 20)
+    player1 = Paddle(5, 30, 5, 20)
     player2 = Paddle(VIRTUAL_WIDTH - 10, VIRTUAL_HEIGHT - 30, 5, 20)
 
     -- place a ball in the middle of the screen
@@ -133,6 +133,39 @@ end
     changes we make will be applied as fast as possible and will vary
     across system hardware.
 ]]
+function randomize_ai_speed()
+    if gameDiff == 'easy' then
+        PADDLE_AI_SPEED_1 = math.random(300,350)+math.abs(ball.y)
+        PADDLE_AI_SPEED_2 = math.random(200,250)+math.abs(ball.y)
+        PADDLE_AI_SPEED_3 = math.random(100,150)+math.abs(ball.y)
+        PADDLE_AI_SPEED_4 = math.random(30,50)+math.abs(ball.y)
+        PADDLE_AI_SPEED_5 = math.random(10,20)
+        PADDLE_AI_DETECTION_1 = 80
+        PADDLE_AI_DETECTION_2 = 30
+        PADDLE_AI_DETECTION_3 = 10
+        PADDLE_AI_DETECTION_4 = math.random(2,7)
+    elseif gameDiff == 'medium' then
+        PADDLE_AI_SPEED_1 = math.random(350,300)+math.abs(ball.y)
+        PADDLE_AI_SPEED_2 = math.random(250,300)+math.abs(ball.y)
+        PADDLE_AI_SPEED_3 = math.random(150,300)+math.abs(ball.y)
+        PADDLE_AI_SPEED_4 = math.random(30,100)+math.abs(ball.y)
+        PADDLE_AI_SPEED_5 = math.random(30,100)
+        PADDLE_AI_DETECTION_1 = 80
+        PADDLE_AI_DETECTION_2 = 30
+        PADDLE_AI_DETECTION_3 = 10
+        PADDLE_AI_DETECTION_4 = math.random(1,5)
+    elseif gameDiff == 'hard' then
+        PADDLE_AI_SPEED_1 = math.random(500,800)+math.abs(ball.y)
+        PADDLE_AI_SPEED_2 = math.random(450,500)+math.abs(ball.y)
+        PADDLE_AI_SPEED_3 = math.random(400,450)+math.abs(ball.y)
+        PADDLE_AI_SPEED_4 = math.random(100,150)+math.abs(ball.y)
+        PADDLE_AI_SPEED_5 = math.random(50,100)
+        PADDLE_AI_DETECTION_1 = 80
+        PADDLE_AI_DETECTION_2 = 30
+        PADDLE_AI_DETECTION_3 = 10
+        PADDLE_AI_DETECTION_4 = math.random(1,3)
+    end
+end
 function love.update(dt)
     if gameState == 'serve' then
         -- before switching to play, initialize ball's velocity based
@@ -144,6 +177,7 @@ function love.update(dt)
             ball.dx = -math.random(140, 200)
         end
         if gameMode == 'ava' then
+            randomize_ai_speed()
             gameState = 'play'
         end
     elseif gameState == 'play' then
@@ -162,22 +196,7 @@ function love.update(dt)
             end
             --randomize ai paddle speed
             -- 1 = 500 2 = 300 3 = 150
-            if gameDiff == 'easy' then
-                PADDLE_AI_SPEED_1 = (300+math.random(1,50))+math.abs(ball.y)
-                PADDLE_AI_SPEED_2 = (200+math.random(1,50))+math.abs(ball.y)
-                PADDLE_AI_SPEED_3 = (100+math.random(1,50))+math.abs(ball.y)
-                PADDLE_AI_SPEED_4 = math.random(0,5)
-            elseif gameDiff == 'medium' then
-                PADDLE_AI_SPEED_1 = (300+math.random(50,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_2 = (200+math.random(50,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_3 = (100+math.random(50,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_4 = math.random(0,4)
-            elseif gameDiff == 'hard' then
-                PADDLE_AI_SPEED_1 = (300+math.random(200,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_2 = (200+math.random(200,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_3 = (100+math.random(200,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_4 = math.random(0,3)
-            end
+            randomize_ai_speed()
             sounds['paddle_hit']:play()
         end
         if ball:collides(player2) then
@@ -192,22 +211,7 @@ function love.update(dt)
             end
             --randomize ai paddle speed
             -- 1 = 500 2 = 300 3 = 150
-            if gameDiff == 'easy' then
-                PADDLE_AI_SPEED_1 = (300+math.random(1,50))+math.abs(ball.y)
-                PADDLE_AI_SPEED_2 = (200+math.random(1,50))+math.abs(ball.y)
-                PADDLE_AI_SPEED_3 = (100+math.random(1,50))+math.abs(ball.y)
-                PADDLE_AI_SPEED_4 = math.random(0,5)
-            elseif gameDiff == 'medium' then
-                PADDLE_AI_SPEED_1 = (300+math.random(50,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_2 = (200+math.random(50,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_3 = (100+math.random(50,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_4 = math.random(0,4)
-            elseif gameDiff == 'hard' then
-                PADDLE_AI_SPEED_1 = (300+math.random(200,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_2 = (200+math.random(200,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_3 = (100+math.random(200,300))+math.abs(ball.y)
-                PADDLE_AI_SPEED_4 = math.random(0,3)
-            end
+            randomize_ai_speed()
             sounds['paddle_hit']:play()
         end
 
@@ -235,7 +239,7 @@ function love.update(dt)
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
-            if player2Score == 10 then
+            if player2Score == 100 then
                 winningPlayer = 2
                 gameState = 'done'
             else
@@ -254,7 +258,7 @@ function love.update(dt)
 
             -- if we've reached a score of 10, the game is over; set the
             -- state to done so we can show the victory message
-            if player1Score == 10 then
+            if player1Score == 100 then
                 winningPlayer = 1
                 gameState = 'done'
             else
@@ -284,26 +288,30 @@ function love.update(dt)
                 --check if in y axis the ball and paddle is near each other
                                         --check distance
                                         -- the distance formula y1 - y2 * y1 - y2
-                if math.abs(player1.y-ball.y) >= 100 then
+                if math.abs(player1.y-ball.y) >= PADDLE_AI_DETECTION_1 then
                     player1.dy = PADDLE_AI_SPEED_1
-                elseif math.abs(player1.y-ball.y) < 100 and math.abs(player1.y-ball.y) > 30 then
+                elseif math.abs(player1.y-ball.y) < PADDLE_AI_DETECTION_1 and math.abs(player1.y-ball.y) > PADDLE_AI_DETECTION_2 then
                     player1.dy = PADDLE_AI_SPEED_2
-                elseif math.abs(player1.y-ball.y) <= 30 and math.abs(player1.y-ball.y) > 5 then
+                elseif math.abs(player1.y-ball.y) <= PADDLE_AI_DETECTION_2 and math.abs(player1.y-ball.y) > PADDLE_AI_DETECTION_3 then
                     player1.dy = PADDLE_AI_SPEED_3
-                elseif math.abs(player1.y-ball.y)-5 <= 5 then
+                elseif math.abs(player1.y-ball.y) <= PADDLE_AI_DETECTION_3 and math.abs(player1.y-ball.y) > PADDLE_AI_DETECTION_4 then
                     player1.dy = PADDLE_AI_SPEED_4
+                elseif math.abs(player1.y-ball.y) <= PADDLE_AI_DETECTION_4 then
+                    player1.dy = PADDLE_AI_SPEED_5
                 end
             elseif ball.y < player1.y then
                                         --check distance
                                         -- the distance formula y1 - y2 * y1 - y2
-                if math.abs(player1.y-ball.y) >= 100 then
+                if math.abs(player1.y-ball.y) >= PADDLE_AI_DETECTION_1 then
                     player1.dy = -PADDLE_AI_SPEED_1
-                elseif math.abs(player1.y-ball.y) < 100 and math.abs(player1.y-ball.y) > 30 then
+                elseif math.abs(player1.y-ball.y) < PADDLE_AI_DETECTION_1 and math.abs(player1.y-ball.y) > PADDLE_AI_DETECTION_2 then
                     player1.dy = -PADDLE_AI_SPEED_2
-                elseif math.abs(player1.y-ball.y) <= 30 and math.abs(player1.y-ball.y) > 5 then
+                elseif math.abs(player1.y-ball.y) <= PADDLE_AI_DETECTION_2 and math.abs(player1.y-ball.y) > PADDLE_AI_DETECTION_3 then
                     player1.dy = -PADDLE_AI_SPEED_3
-                elseif math.abs(player1.y-ball.y)-5 <= 5 then
+                elseif math.abs(player1.y-ball.y) <= PADDLE_AI_DETECTION_3 and math.abs(player1.y-ball.y) > PADDLE_AI_DETECTION_4 then
                     player1.dy = -PADDLE_AI_SPEED_4
+                elseif math.abs(player1.y-ball.y) <= PADDLE_AI_DETECTION_4 then
+                    player1.dy = -PADDLE_AI_SPEED_5
                 end
             end
         else
@@ -331,31 +339,34 @@ function love.update(dt)
             if ball.y > player2.y then
                 --check if in y axis the ball and paddle is near each other
                                         --check distance
-                                        -- the distance formula y1 - y2 * y1 - y2
-                if math.abs(player2.y-ball.y) >= 100 then
+                if math.abs(player2.y-ball.y) >= 80 then
                     player2.dy = PADDLE_AI_SPEED_1
-                elseif math.abs(player2.y-ball.y) < 100 and math.abs(player2.y-ball.y) > 30 then
+                elseif math.abs(player2.y-ball.y) < 80 and math.abs(player2.y-ball.y) > 30 then
                     player2.dy = PADDLE_AI_SPEED_2
-                elseif math.abs(player2.y-ball.y) <= 30 and math.abs(player2.y-ball.y) > 5 then
+                elseif math.abs(player2.y-ball.y) <= 30 and math.abs(player2.y-ball.y) > 10 then
                     player2.dy = PADDLE_AI_SPEED_3
-                elseif math.abs(player2.y-ball.y)-5 <= 5 then
+                elseif math.abs(player2.y-ball.y) <= 10 and math.abs(player2.y-ball.y) > 5 then
                     player2.dy = PADDLE_AI_SPEED_4
+                elseif math.abs(player2.y-ball.y) <= 5 then
+                    player2.dy = PADDLE_AI_SPEED_5
                 end
             elseif ball.y < player2.y then
                                         --check distance
                                         -- the distance formula y1 - y2 * y1 - y2
-                if math.abs(player2.y-ball.y) >= 100 then
+                if math.abs(player2.y-ball.y) >= 80 then
                     player2.dy = -PADDLE_AI_SPEED_1
-                elseif math.abs(player2.y-ball.y) < 100 and math.abs(player2.y-ball.y) > 30 then
+                elseif math.abs(player2.y-ball.y) < 80 and math.abs(player2.y-ball.y) > 30 then
                     player2.dy = -PADDLE_AI_SPEED_2
-                elseif math.abs(player2.y-ball.y) <= 30 and math.abs(player2.y-ball.y) > 5 then
+                elseif math.abs(player2.y-ball.y) <= 30 and math.abs(player2.y-ball.y) > 10 then
                     player2.dy = -PADDLE_AI_SPEED_3
-                elseif math.abs(player2.y-ball.y)-5 <= 5 then
+                elseif math.abs(player2.y-ball.y) <= 10 and math.abs(player2.y-ball.y) > 5 then
                     player2.dy = -PADDLE_AI_SPEED_4
+                elseif math.abs(player2.y-ball.y) <= 5 then
+                    player2.dy = -PADDLE_AI_SPEED_5
                 end
             end
         else
-            --stop when it gets far away from the paddle
+            --stop when it gets far away from the paddle   
             player2.dy = 0
         end
     end
@@ -363,11 +374,11 @@ function love.update(dt)
     -- scale the velocity by dt so movement is framerate-independent
     if gameState == 'play' then
         ball:update(dt)
-        player1:update(dt)
-        player2:update(dt)
+
     end
-
-
+    --this is better :D
+    player1:update(dt)
+    player2:update(dt)
 end
 
 --[[
@@ -380,7 +391,12 @@ function love.keypressed(key)
     -- `key` will be whatever key this callback detected as pressed
     if key == 'escape' then
         -- the function LÖVE2D uses to quit the application
-        love.event.quit()
+        --love.event.quit()
+        if gameState == 'start' then
+            love.event.quit()
+        else
+        gameState = 'start'
+        end
     -- if we press enter during either the start or serve phase, it should
     -- transition to the next appropriate state
     elseif key == 'enter' or key == 'return' then
@@ -415,10 +431,7 @@ function love.keypressed(key)
             gameState = 'serve'
         elseif gameState == 'difficulty' then
             gameDiff = 'easy'
-            PADDLE_AI_SPEED_1 = (300+math.random(1,50))+math.abs(ball.y)
-            PADDLE_AI_SPEED_2 = (200+math.random(1,50))+math.abs(ball.y)
-            PADDLE_AI_SPEED_3 = (100+math.random(1,50))+math.abs(ball.y)
-            PADDLE_AI_SPEED_4 = math.random(0,5)
+            randomize_ai_speed()
             gameState = 'serve'
         end
     elseif key == '2' then
@@ -427,10 +440,7 @@ function love.keypressed(key)
             gameState = 'difficulty'
         elseif gameState == 'difficulty' then
             gameDiff = 'medium'
-            PADDLE_AI_SPEED_1 = (300+math.random(50,300))+math.abs(ball.y)
-            PADDLE_AI_SPEED_2 = (200+math.random(50,300))+math.abs(ball.y)
-            PADDLE_AI_SPEED_3 = (100+math.random(50,300))+math.abs(ball.y)
-            PADDLE_AI_SPEED_4 = math.random(0,4)
+            randomize_ai_speed()
             gameState= 'serve'
         end
     elseif key == '3' then
@@ -439,10 +449,7 @@ function love.keypressed(key)
             gameState = 'difficulty'
         elseif gameState == 'difficulty' then
             gameDiff = 'hard'
-            PADDLE_AI_SPEED_1 = (300+math.random(200,300))+math.abs(ball.y)
-            PADDLE_AI_SPEED_2 = (200+math.random(200,300))+math.abs(ball.y)
-            PADDLE_AI_SPEED_3 = (100+math.random(200,300))+math.abs(ball.y)
-            PADDLE_AI_SPEED_4 = math.random(0,3)
+            randomize_ai_speed()
             gameState = 'serve'
         end
     end
@@ -488,11 +495,22 @@ function love.draw()
     elseif gameState == 'play' then
         --for debugging
         love.graphics.setFont(smallFont)
-        love.graphics.printf('Ball x: ' .. tostring(ball.x) .. 'Ball y: ' .. tostring(ball.y), 0, 50, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Ball and paddle distance to each other: ' .. tostring(math.abs(player2.y-ball.y)), 0, 70, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Paddle Speed Direction: ' .. tostring(math.abs(player2.dy)), 0, 30, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Ball Speed Direction: ' .. tostring(math.abs(ball.dy)), 0, 10, VIRTUAL_WIDTH, 'center')
-        love.graphics.printf('Difficulty: ' .. tostring(gameDiff), 0, 100, VIRTUAL_WIDTH, 'center')
+        if gameMode == 'pvp' then
+            love.graphics.printf('Mode: Player Vs Player', 0, 10, VIRTUAL_WIDTH, 'center')
+        elseif gameMode == 'pva' then
+            love.graphics.printf('Mode: Player Vs AI', 0, 10, VIRTUAL_WIDTH-100, 'center')
+            love.graphics.printf('AI Difficulty: ' .. tostring(gameDiff), 0, 10, VIRTUAL_WIDTH+100, 'center')
+        elseif gameMode == 'ava' then
+            love.graphics.printf('Mode: AI Vs AI', 0, 10, VIRTUAL_WIDTH-100, 'center')
+            love.graphics.printf('AI Difficulty: ' .. tostring(gameDiff), 0, 10, VIRTUAL_WIDTH+100, 'center')
+        end
+
+        --love.graphics.printf('Ball x: ' .. tostring(ball.x) .. 'Ball y: ' .. tostring(ball.y), 0, 50, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Ball and paddle1 distance to each other: ' .. tostring(math.abs(player1.y-ball.y)), 0, 30, VIRTUAL_WIDTH, 'center')
+        love.graphics.printf('Ball and paddle2 distance to each other: ' .. tostring(math.abs(player2.y-ball.y)), 0, 50, VIRTUAL_WIDTH, 'center')
+        --love.graphics.printf('Paddle Speed Direction: ' .. tostring(math.abs(player2.dy)), 0, 30, VIRTUAL_WIDTH, 'center')
+        --love.graphics.printf('Ball Speed Direction: ' .. tostring(math.abs(ball.dy)), 0, 10, VIRTUAL_WIDTH, 'center')
+        --love.graphics.printf('Difficulty: ' .. tostring(gameDiff), 0, 100, VIRTUAL_WIDTH, 'center')
         -- no UI messages to display in play
     elseif gameState == 'done' then
         -- UI messages
